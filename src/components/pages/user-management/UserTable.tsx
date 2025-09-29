@@ -87,25 +87,12 @@ export function Table({
 
                 {/* Report — single button with View/Edit options */}
                 <div className="flex">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button className="h-7 px-3 bg-white/20 text-[#100F0E] border border-cyan-500 hover:bg-white/30">
-                        View &amp; Edit
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start" className="bg-white">
-                      <DropdownMenuItem
-                        onClick={() => onReportView(row, "view")}
-                      >
-                        View
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => onReportView(row, "edit")}
-                      >
-                        Edit
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
+                  <Button
+                    className="h-7 px-3 bg-white/20 text-[#100F0E] border border-cyan-500 hover:bg-white/30"
+                    onClick={() => onReportView(row, "view")}
+                  >
+                    View
+                  </Button>
                 </div>
 
                 {/* Status */}

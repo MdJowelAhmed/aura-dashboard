@@ -24,7 +24,7 @@ export type UserProfileDialogProps = {
     status: "Active" | "Inactive";
     userType?: "Admin" | "Moderator" | "User";
     avatarUrl?: string; // optional avatar
-    passportPhotoUrl?: string; // <-- added: optional passport photo
+    passportPhotoUrl?: string; // optional passport photo
   } | null;
 };
 
@@ -76,9 +76,6 @@ export default function UserProfileDialog({
                 sizes="80px"
                 style={{ objectFit: "cover" }}
                 priority={false}
-                onError={() => {
-                  // If avatar fails, show initials
-                }}
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-gray-600">
@@ -152,8 +149,21 @@ export default function UserProfileDialog({
             )}
           </div>
 
-
-          
+          {/* Preview box */}
+          <div className="rounded-xl border border-dashed border-[#D5D8E1] p-4 text-center bg-white/60">
+            {hasPassport ? (
+              <img
+                src={user.passportPhotoUrl as string}
+                alt="Passport preview"
+                className="mx-auto h-36 w-48 rounded-md object-cover"
+                onError={() => setPassportErrored(true)}
+              />
+            ) : (
+              <div className="text-xs text-gray-600">
+                No passport photo available.
+              </div>
+            )}
+          </div>
         </div>
 
         <div className="flex justify-end pt-4">

@@ -16,8 +16,17 @@ import {
 } from "@/components/ui/select";
 import { SlidersHorizontal } from "lucide-react";
 
-// Sample data matching new headers (+ userType used for filter)
-const usersData: UserRow[] = [
+// Extend the table's UserRow locally to carry optional avatar/passport
+type ExtendedUserRow = UserRow & {
+  avatarUrl?: string;
+  passportPhotoUrl?: string;
+};
+
+type StatusFilter = "Status" | "Active" | "Inactive";
+type UserTypeFilter = "All" | "Admin" | "Moderator" | "User";
+
+// Sample data matching new headers (+ userType used for filter) + passport photos
+const usersData: ExtendedUserRow[] = [
   {
     id: 1,
     userName: "Sabbir Ahmed",
@@ -28,6 +37,8 @@ const usersData: UserRow[] = [
     report: "View",
     status: "Active",
     userType: "Admin",
+    avatarUrl: "/avatars/sabbir.png", // optional local avatar (static file)
+    passportPhotoUrl: "/passports/sabbir-passport.jpg", // <-- shown in profile modal
   },
   {
     id: 2,
@@ -39,6 +50,8 @@ const usersData: UserRow[] = [
     report: "View",
     status: "Active",
     userType: "User",
+    avatarUrl: "/avatars/arif.png",
+    passportPhotoUrl: "/passports/arif-passport.jpg",
   },
   {
     id: 3,
@@ -50,15 +63,15 @@ const usersData: UserRow[] = [
     report: "View",
     status: "Inactive",
     userType: "Moderator",
+    avatarUrl: "/avatars/nusrat.png",
+    passportPhotoUrl: "/passports/nusrat-passport.jpg",
   },
 ];
 
-type StatusFilter = "Status" | "Active" | "Inactive";
-type UserTypeFilter = "All" | "Admin" | "Moderator" | "User";
-
 export function UserManagement() {
-  // Table state
-  const [rows, setRows] = useState<UserRow[]>(usersData);
+  // Table state (widened to ExtendedUserRow so we keep extra fields in TS too)
+  const [rows, setRows] = useState<ExtendedUserRow[]>(usersData);
+
   const [toggleStates, setToggleStates] = useState<Record<number, boolean>>(
     usersData.reduce((acc, r) => {
       acc[r.id] = r.status === "Active";
@@ -145,12 +158,15 @@ export function UserManagement() {
     setReportOpen(true);
   };
 
-  // Profile modal
+  // Profile modal (store full extended row to carry passport/avatars)
   const [profileOpen, setProfileOpen] = useState(false);
-  const [profileUser, setProfileUser] = useState<UserRow | null>(null);
+  const [profileUser, setProfileUser] = useState<ExtendedUserRow | null>(null);
 
   const openProfile = (row: UserRow) => {
-    setProfileUser(row);
+    // row comes from Table (typed as UserRow) but it actually carries extra fields.
+    // Find the full row from our state to ensure we include passport/avatars:
+    const full = rows.find((r) => r.id === row.id) || (row as ExtendedUserRow);
+    setProfileUser(full);
     setProfileOpen(true);
   };
 
