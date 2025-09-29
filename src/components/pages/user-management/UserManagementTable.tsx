@@ -1,12 +1,23 @@
-// UserManagement.tsx  (was GameManagement.tsx)
+// UserManagement.tsx
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { useState } from "react";
-import { Table } from "./UserTable"; // reuse your existing Table file
+import { Input } from "@/components/ui/input";
+import { useMemo, useState } from "react";
+import { Table, UserRow } from "./UserTable";
+import UserReportDialog from "@/components/modal/UserReportDialog";
+import UserProfileDialog from "@/components/modal/UserProfileDialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { SlidersHorizontal } from "lucide-react";
 
-// Sample data matching new headers
-const usersData = [
+// Sample data matching new headers (+ userType used for filter)
+const usersData: UserRow[] = [
   {
     id: 1,
     userName: "Sabbir Ahmed",
@@ -16,6 +27,7 @@ const usersData = [
     joiningDate: "01-02-2025",
     report: "View",
     status: "Active",
+    userType: "Admin",
   },
   {
     id: 2,
@@ -26,6 +38,7 @@ const usersData = [
     joiningDate: "05-02-2025",
     report: "View",
     status: "Active",
+    userType: "User",
   },
   {
     id: 3,
@@ -36,10 +49,16 @@ const usersData = [
     joiningDate: "10-02-2025",
     report: "View",
     status: "Inactive",
+    userType: "Moderator",
   },
 ];
 
+type StatusFilter = "Status" | "Active" | "Inactive";
+type UserTypeFilter = "All" | "Admin" | "Moderator" | "User";
+
 export function UserManagement() {
+  // Table state
+  const [rows, setRows] = useState<UserRow[]>(usersData);
   const [toggleStates, setToggleStates] = useState<Record<number, boolean>>(
     usersData.reduce((acc, r) => {
       acc[r.id] = r.status === "Active";
@@ -47,13 +66,14 @@ export function UserManagement() {
     }, {} as Record<number, boolean>)
   );
 
+  // Filters
+  const [search, setSearch] = useState("");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("Status");
+  const [userTypeFilter, setUserTypeFilter] = useState<UserTypeFilter>("All");
+
+  // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentRows = usersData.slice(indexOfFirstItem, indexOfLastItem);
-  const totalPages = Math.ceil(usersData.length / itemsPerPage);
 
   const headerNames = [
     "SL",
@@ -67,26 +87,141 @@ export function UserManagement() {
     "Action",
   ];
 
+  // Toggle Active/Inactive
+  const handleToggle = (id: number) =>
+    setToggleStates((p) => {
+      const next = !p[id];
+      setRows((rs) =>
+        rs.map((r) =>
+          r.id === id ? { ...r, status: next ? "Active" : "Inactive" } : r
+        )
+      );
+      return { ...p, [id]: next };
+    });
+
+  // Delete
+  const handleDelete = (id: number) => {
+    setRows((rs) => rs.filter((r) => r.id !== id));
+    setToggleStates((prev) => {
+      const { [id]: _, ...rest } = prev;
+      return rest;
+    });
+  };
+
+  // Derived filtered rows (search + filters)
+  const filtered = useMemo(() => {
+    const q = search.trim().toLowerCase();
+    return rows.filter((r) => {
+      const matchesSearch =
+        !q ||
+        r.userName.toLowerCase().includes(q) ||
+        r.email.toLowerCase().includes(q) ||
+        r.location.toLowerCase().includes(q) ||
+        r.phoneNumber.toLowerCase().includes(q);
+      const matchesStatus =
+        statusFilter === "Status" ? true : r.status === statusFilter;
+      const matchesType =
+        userTypeFilter === "All"
+          ? true
+          : (r.userType ?? "User") === userTypeFilter;
+      return matchesSearch && matchesStatus && matchesType;
+    });
+  }, [rows, search, statusFilter, userTypeFilter]);
+
+  // Pagination on filtered
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentRows = filtered.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage) || 1;
+
+  // Report modal
+  const [reportOpen, setReportOpen] = useState(false);
+  const [reportMode, setReportMode] = useState<"view" | "edit">("view");
+  const [reportUser, setReportUser] = useState<UserRow | null>(null);
+
+  const openReport = (row: UserRow, mode: "view" | "edit") => {
+    setReportUser(row);
+    setReportMode(mode);
+    setReportOpen(true);
+  };
+
+  // Profile modal
+  const [profileOpen, setProfileOpen] = useState(false);
+  const [profileUser, setProfileUser] = useState<UserRow | null>(null);
+
+  const openProfile = (row: UserRow) => {
+    setProfileUser(row);
+    setProfileOpen(true);
+  };
+
   return (
-    <div className="w-full mx-auto space-y-6 my-5">
-      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-end">
+    <div className="w-full mx-auto space-y-2 my-5">
+      {/* Controls Row */}
+      <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
+        {/* Left: Search */}
+        <div className="w-full sm:w-100">
+          <Input
+            placeholder="Search here"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="bg-white/20 backdrop-blur-sm border border-white/50 text-white h-12"
+          />
+        </div>
+
+        {/* Right: User Type + Status */}
         <div className="flex gap-3">
-          <Button className="bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl h-12 px-6 hover:bg-white/30 transition-all duration-200">
-            Add New User
-          </Button>
+          {/* User Type */}
+          <Select
+            value={userTypeFilter}
+            onValueChange={(v) => setUserTypeFilter(v as UserTypeFilter)}
+          >
+            <SelectTrigger className="w-40 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl h-12 py-6">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="h-4 w-4 text-white" />
+                <SelectValue placeholder="User Type" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="All">User Type</SelectItem>
+              <SelectItem value="Admin">Admin</SelectItem>
+              <SelectItem value="Moderator">Moderator</SelectItem>
+              <SelectItem value="User">User</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {/* Status */}
+          <Select
+            value={statusFilter}
+            onValueChange={(v) => setStatusFilter(v as StatusFilter)}
+          >
+            <SelectTrigger className="w-32 bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl h-12 py-6">
+              <div className="flex items-center gap-2">
+                <SlidersHorizontal className="h-4 w-4 text-white" />
+                <SelectValue placeholder="Status" />
+              </div>
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Status">Status</SelectItem>
+              <SelectItem value="Active">Active</SelectItem>
+              <SelectItem value="Inactive">Inactive</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
       </div>
 
+      {/* Table */}
       <div className="flex flex-col justify-end items-end">
         <Table
           rows={currentRows}
           toggleStates={toggleStates}
-          handleToggle={(id) =>
-            setToggleStates((p) => ({ ...p, [id]: !p[id] }))
-          }
+          handleToggle={handleToggle}
           headerNames={headerNames}
+          onReportView={openReport}
+          onViewProfile={openProfile}
+          onDelete={handleDelete}
         />
 
+        {/* Pagination */}
         <div className="flex justify-center mt-6 space-x-3">
           {Array.from({ length: totalPages }, (_, i) => (
             <Button
@@ -103,6 +238,25 @@ export function UserManagement() {
           ))}
         </div>
       </div>
+
+      {/* Modals */}
+      <UserReportDialog
+        open={reportOpen}
+        onOpenChange={setReportOpen}
+        mode={reportMode}
+        user={
+          reportUser && {
+            id: reportUser.id,
+            userName: reportUser.userName,
+            email: reportUser.email,
+          }
+        }
+      />
+      <UserProfileDialog
+        open={profileOpen}
+        onOpenChange={setProfileOpen}
+        user={profileUser as any}
+      />
     </div>
   );
 }

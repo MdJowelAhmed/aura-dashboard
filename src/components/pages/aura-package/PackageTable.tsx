@@ -1,15 +1,14 @@
-// PackageTable.tsx (Table component) — same design, 8 columns
 import { Button } from "@/components/ui/button";
 import { Edit3, Trash2 } from "lucide-react";
 
-interface PackageRow {
+export interface PackageRow {
   id: number;
   packageName: string;
-  duration: string; // e.g., "7 days"
-  price: string; // e.g., "$4.99"
-  userPurchase: string; // e.g., "2000"
-  createdOn: string; // e.g., "01-02-2025"
-  status: string; // "Active" | "Inactive"
+  duration: string; // "7 days"
+  price: string; // "$4.99"
+  userPurchase: string;
+  createdOn: string; // "01-02-2025"
+  status: "Active" | "Inactive";
 }
 
 interface TableProps {
@@ -17,6 +16,8 @@ interface TableProps {
   toggleStates: Record<number, boolean>;
   handleToggle: (id: number) => void;
   headerNames: string[];
+  onEdit: (row: PackageRow) => void;
+  onDelete: (id: number) => void;
 }
 
 export function Table({
@@ -24,6 +25,8 @@ export function Table({
   toggleStates,
   handleToggle,
   headerNames,
+  onEdit,
+  onDelete,
 }: TableProps) {
   return (
     <div className="w-full">
@@ -91,7 +94,9 @@ export function Table({
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => onEdit(row)}
                     className="w-8 h-8 p-0 text-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-colors"
+                    title="Edit"
                   >
                     <Edit3 className="h-4 w-4" />
                   </Button>
@@ -113,7 +118,9 @@ export function Table({
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => onDelete(row.id)}
                     className="w-8 h-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    title="Delete"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

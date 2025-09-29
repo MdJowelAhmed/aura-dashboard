@@ -2,19 +2,24 @@ import { Button } from "@/components/ui/button";
 import { Edit3, Trash2 } from "lucide-react";
 import Image from "next/image";
 
-// Type for table props
+// Row type (unchanged)
+export type GameRow = {
+  id: number;
+  image: string;
+  gameTitle: string;
+  description: string;
+  createdOn: string;
+  status: string; // "Active" | "Inactive"
+};
+
+// Props: add onEdit & onDelete
 interface TableProps {
-  bundles: {
-    id: number;
-    image: string;
-    gameTitle: string;
-    description: string;
-    createdOn: string;
-    status: string;
-  }[];
+  bundles: GameRow[];
   toggleStates: Record<number, boolean>;
   handleToggle: (id: number) => void;
-  headerNames: string[]; // New prop for header names
+  headerNames: string[];
+  onEdit: (row: GameRow) => void; // NEW
+  onDelete: (id: number) => void; // NEW
 }
 
 export function Table({
@@ -22,6 +27,8 @@ export function Table({
   toggleStates,
   handleToggle,
   headerNames,
+  onEdit,
+  onDelete,
 }: TableProps) {
   return (
     <div className="w-full">
@@ -53,6 +60,7 @@ export function Table({
                 <div className="text-[#100F0E] font-medium ml-3">
                   {bundle.id}
                 </div>
+
                 <div className="text-[#100F0E] font-medium">
                   <Image
                     src={bundle.image}
@@ -62,12 +70,20 @@ export function Table({
                     className="rounded-full invert"
                   />
                 </div>
+
                 <div className="text-[#100F0E]">{bundle.gameTitle}</div>
                 <div className="text-[#100F0E]">{bundle.description}</div>
                 <div className="text-[#100F0E]">{bundle.createdOn}</div>
+
                 <div>
-                  <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                    {bundle.status}
+                  <span
+                    className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
+                      toggleStates[bundle.id]
+                        ? "bg-green-100 text-green-800"
+                        : "bg-gray-200 text-gray-700"
+                    }`}
+                  >
+                    {toggleStates[bundle.id] ? "Active" : "Inactive"}
                   </span>
                 </div>
 
@@ -76,7 +92,9 @@ export function Table({
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => onEdit(bundle)} // ← wire edit
                     className="w-8 h-8 p-0 text-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-colors"
+                    title="Edit"
                   >
                     <Edit3 className="h-4 w-4" />
                   </Button>
@@ -86,6 +104,7 @@ export function Table({
                     className={`relative inline-flex h-4 w-10 items-center rounded-full transition-colors focus:outline-none ${
                       toggleStates[bundle.id] ? "bg-cyan-500" : "bg-gray-300"
                     }`}
+                    title="Toggle status"
                   >
                     <span
                       className={`inline-block h-3 w-3 transform rounded-full bg-white transition-transform ${
@@ -99,7 +118,9 @@ export function Table({
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => onDelete(bundle.id)} // ← wire delete
                     className="w-8 h-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    title="Delete"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
@@ -107,6 +128,12 @@ export function Table({
               </div>
             </div>
           ))}
+
+          {bundles.length === 0 && (
+            <div className="text-center text-white/90 py-6">
+              No games found.
+            </div>
+          )}
         </div>
       </div>
     </div>

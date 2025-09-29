@@ -2,24 +2,31 @@
 
 import * as React from "react";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  CreateEventForm, CreateEventFormValues,
-} from "@/components/pages/event-management/CreateEventForm";
+import PackageForm, { PackageFormValues } from "../pages/aura-package/PackageForm";
 
-type CreateEventDialogProps = {
+type Props = {
   trigger?: React.ReactNode;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
-  onSubmit: (values: CreateEventFormValues) => Promise<void> | void;
-  initialValues?: Partial<CreateEventFormValues>;
-  initialImageUrl?: string; // NEW
+  onSubmit: (values: PackageFormValues) => Promise<void> | void;
+  initialValues?: Partial<PackageFormValues>;
+  title?: string;
 };
 
-export default function CreateEventDialog({
-  trigger, open, onOpenChange, onSubmit, initialValues, initialImageUrl,
-}: CreateEventDialogProps) {
+export default function PackageDialog({
+  trigger,
+  open,
+  onOpenChange,
+  onSubmit,
+  initialValues,
+  title,
+}: Props) {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const isControlled = typeof open === "boolean";
   const actualOpen = isControlled ? (open as boolean) : internalOpen;
@@ -37,16 +44,18 @@ export default function CreateEventDialog({
       <DialogContent className="max-w-lg sm:max-w-xl bg-white px-6 py-5">
         <DialogHeader>
           <DialogTitle className="text-[22px]">
-            {initialValues ? "Edit Event" : "Create New Event"}
+            {title ?? "Create New Package"}
           </DialogTitle>
         </DialogHeader>
 
-        <CreateEventForm
+        <PackageForm
           initialValues={initialValues}
-          initialImageUrl={initialImageUrl}
           onSubmit={onSubmit}
           onCancel={close}
           afterSubmit={close}
+          submitLabel={
+            title?.toLowerCase().includes("edit") ? "Update" : "Save"
+          }
         />
       </DialogContent>
     </Dialog>

@@ -1,14 +1,16 @@
-// ShopTable.tsx (Table component)
 import { Button } from "@/components/ui/button";
 import { Edit3, Trash2 } from "lucide-react";
 
-interface BundleRow {
+export type BundleType = "Aura" | "Call";
+
+export interface BundleRow {
   id: number;
+  bundleType: BundleType; // internal (not shown)
   totalAura: string;
   totalPrice: string;
   userPurchase: string;
   createdOn: string;
-  status: string;
+  status: "Active" | "Inactive";
 }
 
 interface TableProps {
@@ -16,6 +18,8 @@ interface TableProps {
   toggleStates: Record<number, boolean>;
   handleToggle: (id: number) => void;
   headerNames: string[];
+  onEdit: (row: BundleRow) => void;
+  onDelete: (id: number) => void;
 }
 
 export function Table({
@@ -23,12 +27,14 @@ export function Table({
   toggleStates,
   handleToggle,
   headerNames,
+  onEdit,
+  onDelete,
 }: TableProps) {
   return (
     <div className="w-full">
       {/* Header */}
       <div className="bg-white/20 mt-4 rounded-lg backdrop-blur-sm px-6 py-4 mb-2 border border-white/30">
-        {/* 7 columns to match new headers */}
+        {/* 7 columns to match headers */}
         <div className="grid grid-cols-[50px_1fr_1fr_1fr_1fr_80px_160px] gap-4 text-[16px] font-medium text-white">
           {headerNames.map((header, i) => (
             <div
@@ -87,7 +93,9 @@ export function Table({
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => onEdit(row)}
                     className="w-8 h-8 p-0 text-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-colors"
+                    title="Edit"
                   >
                     <Edit3 className="h-4 w-4" />
                   </Button>
@@ -109,7 +117,9 @@ export function Table({
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => onDelete(row.id)}
                     className="w-8 h-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    title="Delete"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>

@@ -2,24 +2,33 @@
 
 import * as React from "react";
 import {
-  Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger,
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-  CreateEventForm, CreateEventFormValues,
-} from "@/components/pages/event-management/CreateEventForm";
+import { GameForm, GameFormValues } from "../pages/game-management/GameForm";
 
-type CreateEventDialogProps = {
-  trigger?: React.ReactNode;
-  open?: boolean;
-  onOpenChange?: (open: boolean) => void;
-  onSubmit: (values: CreateEventFormValues) => Promise<void> | void;
-  initialValues?: Partial<CreateEventFormValues>;
-  initialImageUrl?: string; // NEW
+type GameDialogProps = {
+  trigger?: React.ReactNode; // for Add usage
+  open?: boolean; // for Edit usage
+  onOpenChange?: (open: boolean) => void; // controlled optional
+  onSubmit: (values: GameFormValues) => Promise<void> | void;
+  initialValues?: Partial<GameFormValues>;
+  initialImageUrl?: string;
+  title?: string; // optional override ("Add Game" / "Edit Game")
 };
 
-export default function CreateEventDialog({
-  trigger, open, onOpenChange, onSubmit, initialValues, initialImageUrl,
-}: CreateEventDialogProps) {
+export default function GameDialog({
+  trigger,
+  open,
+  onOpenChange,
+  onSubmit,
+  initialValues,
+  initialImageUrl,
+  title,
+}: GameDialogProps) {
   const [internalOpen, setInternalOpen] = React.useState(false);
   const isControlled = typeof open === "boolean";
   const actualOpen = isControlled ? (open as boolean) : internalOpen;
@@ -31,17 +40,18 @@ export default function CreateEventDialog({
 
   const close = () => handleOpenChange(false);
 
+  const hdr = title ?? (initialValues ? "Edit Game" : "Add Game");
+
   return (
     <Dialog open={actualOpen} onOpenChange={handleOpenChange}>
       {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+      {/* keep same style language you've used elsewhere */}
       <DialogContent className="max-w-lg sm:max-w-xl bg-white px-6 py-5">
         <DialogHeader>
-          <DialogTitle className="text-[22px]">
-            {initialValues ? "Edit Event" : "Create New Event"}
-          </DialogTitle>
+          <DialogTitle className="text-[22px]">{hdr}</DialogTitle>
         </DialogHeader>
 
-        <CreateEventForm
+        <GameForm
           initialValues={initialValues}
           initialImageUrl={initialImageUrl}
           onSubmit={onSubmit}

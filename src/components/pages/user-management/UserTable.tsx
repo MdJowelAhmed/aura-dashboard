@@ -1,16 +1,22 @@
-// UserTable.tsx (Table component) — unchanged style, 9 columns
 import { Button } from "@/components/ui/button";
-import { Edit3, Trash2 } from "lucide-react";
+import { Eye, Trash2 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-interface UserRow {
+export interface UserRow {
   id: number;
   userName: string;
   email: string;
   location: string;
   phoneNumber: string;
   joiningDate: string;
-  report: string; // e.g., "View" or a count
-  status: string; // "Active" | "Inactive"
+  report: string; // label
+  status: "Active" | "Inactive";
+  userType?: "Admin" | "Moderator" | "User";
 }
 
 interface TableProps {
@@ -18,6 +24,9 @@ interface TableProps {
   toggleStates: Record<number, boolean>;
   handleToggle: (id: number) => void;
   headerNames: string[];
+  onReportView: (row: UserRow, mode: "view" | "edit") => void;
+  onViewProfile: (row: UserRow) => void;
+  onDelete: (id: number) => void;
 }
 
 export function Table({
@@ -25,6 +34,9 @@ export function Table({
   toggleStates,
   handleToggle,
   headerNames,
+  onReportView,
+  onViewProfile,
+  onDelete,
 }: TableProps) {
   return (
     <div className="w-full">
@@ -73,11 +85,27 @@ export function Table({
                 {/* Joining Date */}
                 <div className="text-[#100F0E]">{row.joiningDate}</div>
 
-                {/* Report */}
+                {/* Report — single button with View/Edit options */}
                 <div className="flex">
-                  <Button className="h-7 px-3 bg-white/20 text-[#100F0E] border border-cyan-500 hover:bg-white/30">
-                    {row.report}
-                  </Button>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button className="h-7 px-3 bg-white/20 text-[#100F0E] border border-cyan-500 hover:bg-white/30">
+                        View &amp; Edit
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start" className="bg-white">
+                      <DropdownMenuItem
+                        onClick={() => onReportView(row, "view")}
+                      >
+                        View
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        onClick={() => onReportView(row, "edit")}
+                      >
+                        Edit
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
                 </div>
 
                 {/* Status */}
@@ -93,14 +121,16 @@ export function Table({
                   </span>
                 </div>
 
-                {/* Action */}
+                {/* Action — View (profile) + toggle + delete */}
                 <div className="flex justify-center items-center gap-2 w-[125px] mx-auto border border-cyan-500 rounded-sm">
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => onViewProfile(row)}
                     className="w-8 h-8 p-0 text-cyan-500 hover:bg-cyan-50 hover:text-cyan-600 transition-colors"
+                    title="View Profile"
                   >
-                    <Edit3 className="h-4 w-4" />
+                    <Eye className="h-4 w-4" />
                   </Button>
 
                   <button
@@ -120,7 +150,9 @@ export function Table({
                   <Button
                     variant="ghost"
                     size="sm"
+                    onClick={() => onDelete(row.id)}
                     className="w-8 h-8 p-0 text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors"
+                    title="Delete"
                   >
                     <Trash2 className="h-4 w-4" />
                   </Button>
