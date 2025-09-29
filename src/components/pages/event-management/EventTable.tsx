@@ -1,8 +1,6 @@
-// Table.tsx
-
+// EventTable.tsx
 import { Button } from "@/components/ui/button";
 import { Edit3, Trash2 } from "lucide-react";
-
 // Type for table props
 interface TableProps {
   bundles: {

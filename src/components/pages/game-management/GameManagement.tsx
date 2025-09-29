@@ -18,7 +18,7 @@ const gameData = [
   },
   {
     id: 2,
-    image: "/call-logo.png",
+    image: "/aura-logo.png",
     gameTitle: "Call Bundle Event",
     description: "A thrilling Call bundle event.",
     createdOn: "02-02-2025",
@@ -26,7 +26,7 @@ const gameData = [
   },
   {
     id: 3,
-    image: "/premium-logo.png",
+    image: "/aura-logo.png",
     gameTitle: "Premium Bundle Event",
     description: "Premium bundles with exclusive features.",
     createdOn: "03-02-2025",

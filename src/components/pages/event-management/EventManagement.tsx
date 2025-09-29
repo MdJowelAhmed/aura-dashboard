@@ -1,4 +1,3 @@
-// EventManagement.tsx
 "use client";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,10 +9,13 @@ import {
 } from "@/components/ui/select";
 import { SlidersHorizontal } from "lucide-react";
 import { useState } from "react";
-import { Table } from "./EventTable"; // Import the Table component
+import { Table } from "./EventTable";
 
-// Sample bundle data
-const bundleData = [
+import CreateEventDialog from "@/components/modal/CreateEventDialog";
+import { CreateEventFormValues } from "./CreateEventForm";
+
+// Sample bundle data (make this stateful so we can append new events)
+const initialData = [
   {
     id: 1,
     eventName: "Aura Bundle Event",
@@ -43,12 +45,16 @@ const bundleData = [
 export function EventManagement() {
   const [statusFilter, setStatusFilter] = useState("Active");
   const [bundleFilter, setBundleFilter] = useState("Aura Bundle");
+
+  const [bundles, setBundles] = useState(initialData);
+
   const [toggleStates, setToggleStates] = useState<Record<number, boolean>>(
-    bundleData.reduce((acc, bundle) => {
+    initialData.reduce((acc, bundle) => {
       acc[bundle.id] = true;
       return acc;
     }, {} as Record<number, boolean>)
   );
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(5);
 
@@ -63,13 +69,13 @@ export function EventManagement() {
     setCurrentPage(page);
   };
 
+  // Derived pagination
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentBundles = bundleData.slice(indexOfFirstItem, indexOfLastItem);
+  const currentBundles = bundles.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(bundles.length / itemsPerPage);
 
-  const totalPages = Math.ceil(bundleData.length / itemsPerPage);
-
-  // Header names array
+  // Headers
   const headerNames = [
     "SL",
     "Event Name",
@@ -79,6 +85,34 @@ export function EventManagement() {
     "Status",
     "Actions",
   ];
+
+  // On Create Event submit (from modal)
+  const handleCreateEvent = async (values: CreateEventFormValues) => {
+    // Map modal values to your table shape
+    const nextId = Math.max(0, ...bundles.map((b) => b.id)) + 1;
+
+    const newRow = {
+      id: nextId,
+      eventName: values.eventName,
+      // turn enum values into labels if you want:
+      eventType:
+        values.eventType === "unlimited_ad_time"
+          ? "Unlimited Ad Time"
+          : values.eventType === "limited_slots"
+          ? "Limited Slots"
+          : "Premium Event",
+      // convert ISO datetime-local to your display format if needed
+      startTime: new Date(values.startDateTime).toLocaleString(),
+      endTime: new Date(values.endDateTime).toLocaleString(),
+      status: "Active",
+    };
+
+    setBundles((prev) => [newRow, ...prev]);
+    setToggleStates((prev) => ({ ...prev, [nextId]: true }));
+
+    // TODO: call your API here if needed
+    // await api.createEvent(values)
+  };
 
   return (
     <div className="w-full mx-auto space-y-6 my-5">
@@ -114,9 +148,15 @@ export function EventManagement() {
         </div>
 
         <div className="flex gap-3">
-          <Button className="bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl h-12 px-6 hover:bg-white/30 transition-all duration-200">
-            Create New Event
-          </Button>
+          {/* Use the modal here as a trigger */}
+          <CreateEventDialog
+            trigger={
+              <Button className="bg-white/20 backdrop-blur-sm border border-white/30 text-white rounded-xl h-12 px-6 hover:bg-white/30 transition-all duration-200">
+                Create New Event
+              </Button>
+            }
+            onSubmit={handleCreateEvent}
+          />
         </div>
       </div>
 
@@ -126,7 +166,7 @@ export function EventManagement() {
           bundles={currentBundles}
           toggleStates={toggleStates}
           handleToggle={handleToggle}
-          headerNames={headerNames} // Pass header names as prop
+          headerNames={headerNames}
         />
 
         {/* Pagination */}

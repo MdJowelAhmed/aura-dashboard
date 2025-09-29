@@ -21,7 +21,6 @@ const Navbar = () => {
   const [pathname, setPathname] = useState("");
   const location = usePathname();
   const path = location.split("/")[1] || "/";
-  // const path = location.pathname.split("/")[1] || "/";
 
   useEffect(() => {
     setPathname(path);
@@ -76,6 +75,19 @@ const Navbar = () => {
         >
           <Tag className="w-5 h-5" />
           <span>Promo Code</span>
+        </div>
+      </Link>
+
+      <Link href={"/video-call-settings"}>
+        <div
+          className={`flex items-center space-x-3 p-3 rounded-lg ${
+            pathname === "video-call-settings"
+              ? "font-medium bg-white text-black"
+              : "hover:bg-white/10 transition-colors"
+          } `}
+        >
+          <Video className="w-5 h-5" />
+          <span>Video Call Settings</span>
         </div>
       </Link>
 
@@ -141,18 +153,6 @@ const Navbar = () => {
         </div>
       </Link>
 
-      <Link href={"/video-call-settings"}>
-        <div
-          className={`flex items-center space-x-3 p-3 rounded-lg ${
-            pathname === "video-call-settings"
-              ? "font-medium bg-white text-black"
-              : "hover:bg-white/10 transition-colors"
-          } `}
-        >
-          <Video className="w-5 h-5" />
-          <span>Video Call Settings</span>
-        </div>
-      </Link>
       <Link href={"/push-notification"}>
         <div
           className={`flex items-center space-x-3 p-3 rounded-lg ${
