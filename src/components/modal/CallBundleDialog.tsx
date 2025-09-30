@@ -42,7 +42,11 @@ export default function CallBundleDialog({
 
   return (
     <Dialog open={actualOpen} onOpenChange={handleOpenChange}>
-      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+      {trigger && (
+        <DialogTrigger asChild>
+          {React.isValidElement(trigger) ? trigger : <span>{trigger}</span>}
+        </DialogTrigger>
+      )}
       <DialogContent className="max-w-lg sm:max-w-xl bg-white px-6 py-5">
         <DialogHeader>
           <DialogTitle className="text-[22px]">

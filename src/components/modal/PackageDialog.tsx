@@ -40,7 +40,7 @@ export default function PackageDialog({
 
   return (
     <Dialog open={actualOpen} onOpenChange={handleOpenChange}>
-      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+      {trigger && <DialogTrigger asChild>{trigger as React.ReactElement}</DialogTrigger>}
       <DialogContent className="max-w-lg sm:max-w-xl bg-white px-6 py-5">
         <DialogHeader>
           <DialogTitle className="text-[22px]">

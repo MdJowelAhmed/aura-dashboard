@@ -34,42 +34,40 @@ export default function VideoCallSettings() {
   const fileInputRef = useRef(null);
 
   // Handle image upload
-  const handleImageUpload = (e) => {
-    const file = e.target.files[0];
-    setUploadError("");
+ const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0];
+  setUploadError("");
 
-    if (file) {
-      // Check file size (2MB = 2 * 1024 * 1024 bytes)
-      if (file.size > 2 * 1024 * 1024) {
-        setUploadError("File size exceeds 2MB limit");
-        return;
-      }
-
-      // Check file type
-      const validTypes = ["image/jpeg", "image/jpg", "image/png"];
-      if (!validTypes.includes(file.type)) {
-        setUploadError("Only .jpg and .png files are allowed");
-        return;
-      }
-
-      // Create preview
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setUploadedImage({
-          file: file,
-          preview: reader.result,
-          name: file.name,
-        });
-      };
-      reader.readAsDataURL(file);
+  if (file) {
+    if (file.size > 2 * 1024 * 1024) {
+      setUploadError("File size exceeds 2MB limit");
+      return;
     }
-  };
+
+    const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+    if (!validTypes.includes(file.type)) {
+      setUploadError("Only .jpg and .png files are allowed");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setUploadedImage({
+        file,
+        preview: reader.result,
+        name: file.name,
+      });
+    };
+    reader.readAsDataURL(file);
+  }
+};
+
 
   // Remove uploaded image
   const handleRemoveImage = () => {
     setUploadedImage(null);
     if (fileInputRef.current) {
-      fileInputRef.current.value = "";
+      (fileInputRef.current as HTMLInputElement).value = "";
     }
   };
 
@@ -81,7 +79,7 @@ export default function VideoCallSettings() {
   };
 
   // Convert hex to RGB
-  const hexToRgb = (hex) => {
+  const hexToRgb = (hex: string) => {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result
       ? {
@@ -108,7 +106,7 @@ export default function VideoCallSettings() {
       freeAddTimeUses: freeAddTimeUses,
       maxCallDuration: maxCallDuration,
       backgroundColor: selectedColor,
-      backgroundImage: uploadedImage ? uploadedImage.name : null,
+      backgroundImage: uploadedImage ? (uploadedImage as { name: string }).name : null,
       savedColors: savedColors,
     };
 
@@ -117,7 +115,7 @@ export default function VideoCallSettings() {
   };
 
   // Handle numeric input validation
-  const handleNumericInput = (value, setter) => {
+  const handleNumericInput = (value: string, setter: React.Dispatch<React.SetStateAction<string>>) => {
     const numValue = value.replace(/[^0-9]/g, "");
     setter(numValue);
   };
@@ -215,7 +213,10 @@ export default function VideoCallSettings() {
                   style={{
                     background: `linear-gradient(135deg, ${selectedColor}, #1a1a1a)`,
                   }}
-                  onClick={() => document.getElementById("colorInput").click()}
+                  onClick={() => {
+                    const el = document.getElementById("colorInput");
+                    if (el) (el as HTMLInputElement).click();
+                  }}
                 ></div>
 
                 {/* Hidden color input */}
@@ -235,14 +236,20 @@ export default function VideoCallSettings() {
                       background:
                         "linear-gradient(to right, #ff0000, #ff8000, #ffff00, #80ff00, #00ff00, #00ff80, #00ffff, #0080ff, #0000ff, #8000ff, #ff00ff, #ff0080)",
                     }}
-                    onClick={() => document.getElementById("colorInput").click()}
+                    onClick={() => {
+                      const el = document.getElementById("colorInput");
+                      if (el) (el as HTMLInputElement).click();
+                    }}
                   ></div>
                   <div
                     className="w-full h-4 rounded-lg cursor-pointer"
                     style={{
                       background: `linear-gradient(to right, #ffffff, ${selectedColor}, #000000)`,
                     }}
-                    onClick={() => document.getElementById("colorInput").click()}
+                    onClick={() => {
+                      const el = document.getElementById("colorInput");
+                      if (el) (el as HTMLInputElement).click();
+                    }}
                   ></div>
                 </div>
 
@@ -302,7 +309,10 @@ export default function VideoCallSettings() {
               {!uploadedImage ? (
                 <div
                   className="border-2 border-dashed border-gray-400 rounded-lg p-8 text-center bg-transparent cursor-pointer hover:border-gray-300 transition-colors"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => {
+                    const input = fileInputRef.current as unknown as HTMLInputElement;
+                    input?.click();
+                  }}
                 >
                   <Upload className="w-12 h-12 text-gray-50 mx-auto mb-4" />
                   <p className="text-gray-50 text-sm">
@@ -328,14 +338,14 @@ export default function VideoCallSettings() {
                     <X className="w-4 h-4" />
                   </button>
                   <Image
-                    src={uploadedImage.preview}
+                    src={(uploadedImage as { preview: string }).preview || ""}
                     alt="Uploaded preview"
                     width={200}
                     height={100}
                     className="w-full h-48 object-cover rounded-lg mb-2"
                   />
                   <p className="text-gray-50 text-sm text-center truncate">
-                    {uploadedImage.name}
+                    {(uploadedImage as { name: string }).name}
                   </p>
                 </div>
               )}

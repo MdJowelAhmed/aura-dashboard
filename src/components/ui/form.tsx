@@ -4,9 +4,9 @@
 import * as React from "react";
 import {
   Controller,
-  ControllerProps,
-  FieldPath,
-  FieldValues,
+  type ControllerProps,
+  type FieldPath,
+  type FieldValues,
   FormProvider,
   useFormContext,
 } from "react-hook-form";
@@ -15,18 +15,31 @@ import { cn } from "@/lib/utils";
 
 /**
  * Minimal shadcn-compatible form primitives
- * Works with:
- * <Form {...form}><form>...<FormField name="x" render={({field}) => (
- *   <FormItem>
- *     <FormLabel>Label</FormLabel>
- *     <FormControl><Input {...field} /></FormControl>
- *     <FormMessage />
- *   </FormItem>
- * )} /></form></Form>
+ * Usage:
+ * <Form {...form}>
+ *   <form>
+ *     <FormField
+ *       name="email"
+ *       render={({ field }) => (
+ *         <FormItem>
+ *           <FormLabel>Email</FormLabel>
+ *           <FormControl>
+ *             <input id={useFormField().formItemId} {...field} />
+ *           </FormControl>
+ *           <FormDescription>We’ll never share it.</FormDescription>
+ *           <FormMessage />
+ *         </FormItem>
+ *       )}
+ *     />
+ *   </form>
+ * </Form>
  */
 
 
 export const Form = FormProvider;
+
+
+/* -------------------------------- context -------------------------------- */
 
 
 type FormFieldContextValue<
@@ -38,6 +51,9 @@ type FormFieldContextValue<
 const FormFieldContext = React.createContext<FormFieldContextValue | null>(
   null
 );
+
+
+/* ------------------------------- main hooks ------------------------------ */
 
 
 export function useFormField() {
@@ -59,17 +75,33 @@ export function useFormField() {
 }
 
 
+/* ---------------------- Controller inference workaround ------------------ */
+/** Make Controller JSX-friendly with preserved generics */
+const TypedController = Controller as unknown as <
+  TFieldValues extends FieldValues = FieldValues,
+  TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
+>(
+  props: ControllerProps<TFieldValues, TName>
+) => React.ReactElement;
+
+
+/* --------------------------------- field --------------------------------- */
+
+
 export function FormField<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 >(props: ControllerProps<TFieldValues, TName>) {
   const { name, ...rest } = props;
   return (
-    <FormFieldContext.Provider value={{ name }}>
-      <Controller name={name} {...rest} />
+    <FormFieldContext.Provider value={{ name } as FormFieldContextValue}>
+      <TypedController name={name} {...rest} />
     </FormFieldContext.Provider>
   );
 }
+
+
+/* ------------------------------- primitives ------------------------------ */
 
 
 export function FormItem({
@@ -84,8 +116,8 @@ export function FormLabel({
   className,
   ...props
 }: React.LabelHTMLAttributes<HTMLLabelElement>) {
-  // Associate the label with the input via aria-* for accessibility
-  const { formItemId } = safeUseFormIds();
+  // Associate the label with the input via htmlFor/aria-*
+  const { formItemId } = useSafeFormIds();
   return (
     <label
       className={cn("text-sm font-medium", className)}
@@ -100,7 +132,7 @@ export function FormControl({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) {
-  // Simple wrapper; shadcn uses Slot, but a div works for most cases
+  // Wrapper around the control; shadcn uses Slot, a div works fine.
   return <div className={cn(className)} {...props} />;
 }
 
@@ -110,9 +142,17 @@ export function FormMessage({
   children,
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) {
-  const { fieldState, formMessageId } = safeUseFormIds();
-  const body = fieldState.error ? String(fieldState.error.message) : null;
+  const { fieldState, formMessageId } = useSafeFormIds();
+
+
+  // react-hook-form error types can vary; pick message safely
+  const rawMsg = (fieldState?.error as { message?: string })?.message;
+  const body = typeof rawMsg === "string" ? rawMsg : null;
+
+
   if (!body && !children) return null;
+
+
   return (
     <p
       id={formMessageId}
@@ -129,7 +169,7 @@ export function FormDescription({
   className,
   ...props
 }: React.HTMLAttributes<HTMLParagraphElement>) {
-  const { formDescriptionId } = safeUseFormIds();
+  const { formDescriptionId } = useSafeFormIds();
   return (
     <p
       id={formDescriptionId}
@@ -140,15 +180,22 @@ export function FormDescription({
 }
 
 
-/* ---------- helpers ---------- */
-function safeUseFormIds() {
-  // Use defaults if not inside a FormField (prevents crashes in edge cases)
+/* -------------------------------- helpers -------------------------------- */
+
+
+/**
+ * Graceful fallback if used outside <FormField> (prevents crashes).
+ * Also exported so other modules can import if you split files later.
+ */
+export function useSafeFormIds() {
   try {
     return useFormField();
   } catch {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const id = React.useId();
+    // Type-friendly fallback object that mimics useFormField() shape
     return {
-      name: "",
+      name: "" as FieldPath<FieldValues>,
       id,
       formItemId: `${id}-form-item`,
       formDescriptionId: `${id}-form-item-description`,
@@ -158,9 +205,8 @@ function safeUseFormIds() {
         isTouched: false,
         isDirty: false,
         error: undefined,
-      },
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } as any;
+      } as ReturnType<ReturnType<typeof useFormContext>["getFieldState"]>,
+    };
   }
 }
 

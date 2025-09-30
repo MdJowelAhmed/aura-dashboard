@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, {
   createContext,
   useContext,
@@ -11,6 +12,7 @@ import React, {
 } from "react";
 import { cn } from "@/lib/utils";
 
+
 type Ctx = {
   open: boolean;
   setOpen: (v: boolean) => void;
@@ -18,9 +20,11 @@ type Ctx = {
 };
 const DropdownCtx = createContext<Ctx | null>(null);
 
+
 export function DropdownMenu({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false);
   const triggerRef = useRef<HTMLElement>(null);
+
 
   // close on Escape
   useEffect(() => {
@@ -32,12 +36,14 @@ export function DropdownMenu({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
+
   return (
-    <DropdownCtx.Provider value={{ open, setOpen, triggerRef }}>
+    <DropdownCtx.Provider value={{ open, setOpen, triggerRef: triggerRef as React.RefObject<HTMLElement> }}>
       <div className="relative inline-block">{children}</div>
     </DropdownCtx.Provider>
   );
 }
+
 
 function useDropdownCtx() {
   const ctx = useContext(DropdownCtx);
@@ -46,6 +52,7 @@ function useDropdownCtx() {
   return ctx;
 }
 
+
 type TriggerProps = {
   asChild?: boolean;
   children: React.ReactElement;
@@ -53,10 +60,12 @@ type TriggerProps = {
 export function DropdownMenuTrigger({ asChild, children }: TriggerProps) {
   const { open, setOpen, triggerRef } = useDropdownCtx();
 
+
   const onClick = (e: MouseEvent) => {
     e.stopPropagation();
     setOpen(!open);
   };
+
 
   useEffect(() => {
     const onDocClick = (e: MouseEvent) => {
@@ -68,19 +77,21 @@ export function DropdownMenuTrigger({ asChild, children }: TriggerProps) {
       if (content && content.contains(target)) return;
       setOpen(false);
     };
-    document.addEventListener("click", onDocClick as EventListener);
-    return () => document.removeEventListener("click", onDocClick as EventListener);
+    document.addEventListener("click", onDocClick as unknown as EventListener);
+    return () => document.removeEventListener("click", onDocClick as unknown as EventListener);
   }, [setOpen, triggerRef]);
+
 
   if (asChild) {
     return React.cloneElement(children, {
-      ref: triggerRef as React.RefObject<HTMLElement>,
+      ref: triggerRef,
       onClick,
-      className: cn(children.props.className),
+      className: cn((children as React.ReactElement<{ className?: string }>).props?.className),
       "aria-haspopup": "menu",
       "aria-expanded": open,
     });
   }
+
 
   return (
     <button
@@ -88,12 +99,13 @@ export function DropdownMenuTrigger({ asChild, children }: TriggerProps) {
       onClick={onClick}
       aria-haspopup="menu"
       aria-expanded={open}
-      className={cn(children.props?.className)}
+      className={cn((children as React.ReactElement<{ className?: string }>).props?.className)}
     >
       {children}
     </button>
   );
 }
+
 
 type ContentProps = HTMLAttributes<HTMLDivElement> & {
   align?: "start" | "end" | "center";
@@ -109,10 +121,12 @@ export function DropdownMenuContent({
   const { open, setOpen, triggerRef } = useDropdownCtx();
   const ref = useRef<HTMLDivElement>(null);
 
+
   // position under trigger
   useEffect(() => {
     if (!open || !triggerRef.current || !ref.current) return;
     const triggerRect = triggerRef.current.getBoundingClientRect();
+
 
     const top = triggerRect.height + sideOffset;
     // left alignment inside the relatively positioned wrapper
@@ -120,7 +134,9 @@ export function DropdownMenuContent({
     // align handling by CSS classes below
   }, [open, sideOffset, triggerRef]);
 
+
   if (!open) return null;
+
 
   return (
     <div
@@ -145,6 +161,7 @@ export function DropdownMenuContent({
   );
 }
 
+
 export function DropdownMenuItem({
   className,
   ...props
@@ -161,6 +178,7 @@ export function DropdownMenuItem({
   );
 }
 
+
 export function DropdownMenuLabel({
   className,
   ...props
@@ -176,6 +194,7 @@ export function DropdownMenuLabel({
   );
 }
 
+
 export function DropdownMenuSeparator({
   className,
   ...props
@@ -184,6 +203,7 @@ export function DropdownMenuSeparator({
     <div className={cn("-mx-1 my-1 h-px bg-gray-200", className)} {...props} />
   );
 }
+
 
 /* Optional no-ops to match shadcn's named exports API (if ever imported) */
 export const DropdownMenuGroup = ({
@@ -216,10 +236,14 @@ export const DropdownMenuRadioGroup = ({
 }: {
   children: React.ReactNode;
 }) => <>{children}</>;
-export const DropdownMenuCheckboxItem = (props: React.ComponentPropsWithoutRef<typeof DropdownMenuItem>) => (
+export const DropdownMenuCheckboxItem = (
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>
+) => (
   <DropdownMenuItem {...props} />
 );
-export const DropdownMenuRadioItem = (props: React.ComponentPropsWithoutRef<typeof DropdownMenuItem>) => (
+export const DropdownMenuRadioItem = (
+  props: React.ButtonHTMLAttributes<HTMLButtonElement>
+) => (
   <DropdownMenuItem {...props} />
 );
 export const DropdownMenuShortcut = (
@@ -233,3 +257,8 @@ export const DropdownMenuShortcut = (
     {...props}
   />
 );
+
+
+
+
+

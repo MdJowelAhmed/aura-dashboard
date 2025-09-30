@@ -1,9 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -25,29 +23,15 @@ import { ImagePlus } from "lucide-react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-export const promoSchema = z.object({
-  promoCode: z.string().min(1, "Promo code is required"),
-  discountType: z.enum(["Percentage", "Flat"], {
-    required_error: "Select discount type",
-  }),
-  value: z.string().min(1, "Select discount value"),
-  usageLimit: z
-    .string()
-    .min(1, "Usage limit is required")
-    .refine((v) => Number(v) > 0, "Must be greater than 0"),
-  startDateTime: z.string().min(1, "Start date & time is required"),
-  endDateTime: z.string().min(1, "End date & time is required"),
-  thumbnail: z
-    .instanceof(File)
-    .optional()
-    .refine((f) => !f || f.size <= 2 * 1024 * 1024, "Image must be ≤ 2MB")
-    .refine(
-      (f) => !f || ["image/jpeg", "image/png", "image/jpg"].includes(f.type),
-      "Only .jpg / .jpeg / .png"
-    ),
-});
-
-export type PromoFormValues = z.infer<typeof promoSchema>;
+export type PromoFormValues = {
+  promoCode: string;
+  discountType: "Percentage" | "Flat";
+  value: string;
+  usageLimit: string;
+  startDateTime: string;
+  endDateTime: string;
+  thumbnail?: File;
+};
 
 const PERCENT_VALUES = ["5%", "10%", "15%", "20%", "25%", "30%", "40%", "50%"];
 const FLAT_VALUES = ["5", "10", "25", "50", "100", "200", "500"];
@@ -76,7 +60,6 @@ export function PromoForm({
   afterSubmit,
 }: Props) {
   const form = useForm<PromoFormValues>({
-    resolver: zodResolver(promoSchema),
     defaultValues: {
       promoCode: initialValues?.promoCode ?? "",
       discountType: initialValues?.discountType ?? "Percentage",
@@ -121,7 +104,7 @@ export function PromoForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(submit)} className="space-y-4">
-        {/* Promo Code with Generate button to the right */}
+        {/* Promo Code with Generate button */}
         <FormField
           control={form.control}
           name="promoCode"
@@ -143,7 +126,6 @@ export function PromoForm({
                   Generate
                 </Button>
               </div>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -166,7 +148,6 @@ export function PromoForm({
                   <SelectItem value="Flat">Flat</SelectItem>
                 </SelectContent>
               </Select>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -192,7 +173,6 @@ export function PromoForm({
                   ))}
                 </SelectContent>
               </Select>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -205,14 +185,8 @@ export function PromoForm({
             <FormItem>
               <FormLabel>Usage Limit</FormLabel>
               <FormControl>
-                <Input
-                  type="number"
-                  min={1}
-                  placeholder="Enter usage limit"
-                  {...field}
-                />
+                <Input type="number" min={1} placeholder="Enter usage limit" {...field} />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -227,7 +201,6 @@ export function PromoForm({
               <FormControl>
                 <Input type="datetime-local" {...field} />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -242,7 +215,6 @@ export function PromoForm({
               <FormControl>
                 <Input type="datetime-local" {...field} />
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />
@@ -286,7 +258,6 @@ export function PromoForm({
                   />
                 </div>
               </FormControl>
-              <FormMessage />
             </FormItem>
           )}
         />

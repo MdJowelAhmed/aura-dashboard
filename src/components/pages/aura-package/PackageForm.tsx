@@ -1,9 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -22,18 +20,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export const packageSchema = z.object({
-  packageName: z.string().min(1, "Package name is required"),
-  duration: z.enum(["7 days", "30 days", "90 days"], {
-    required_error: "Select duration",
-  }),
-  price: z
-    .string()
-    .min(1, "Price is required")
-    .refine((v) => Number(v) >= 0, "Must be 0 or greater"),
-});
-
-export type PackageFormValues = z.infer<typeof packageSchema>;
+export type PackageFormValues = {
+  packageName: string;
+  duration: "7 days" | "30 days" | "90 days";
+  price: string;
+};
 
 const DURATION_OPTIONS = ["7 days", "30 days", "90 days"] as const;
 
@@ -53,10 +44,9 @@ export default function PackageForm({
   submitLabel = "Save",
 }: Props) {
   const form = useForm<PackageFormValues>({
-    resolver: zodResolver(packageSchema),
     defaultValues: {
       packageName: initialValues?.packageName ?? "",
-      duration: initialValues?.duration as z.infer<typeof packageSchema>["duration"] ?? undefined,
+      duration: initialValues?.duration ?? undefined,
       price: initialValues?.price ?? "",
     },
   });
@@ -83,7 +73,11 @@ export default function PackageForm({
             <FormItem>
               <FormLabel>Package Name</FormLabel>
               <FormControl>
-                <Input placeholder="Enter package name" {...field} />
+                <Input
+                  placeholder="Enter package name"
+                  {...field}
+                  required
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -97,7 +91,11 @@ export default function PackageForm({
           render={({ field }) => (
             <FormItem>
               <FormLabel>Duration</FormLabel>
-              <Select onValueChange={field.onChange} value={field.value}>
+              <Select
+                onValueChange={field.onChange}
+                value={field.value}
+                required
+              >
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Select duration" />
@@ -130,6 +128,7 @@ export default function PackageForm({
                   min={0}
                   placeholder="e.g. 4.99"
                   {...field}
+                  required
                 />
               </FormControl>
               <FormMessage />

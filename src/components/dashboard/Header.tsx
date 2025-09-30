@@ -13,7 +13,7 @@ import {
 import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 import { GoBellFill } from "react-icons/go";
-import NotificationsModal from "./NotificationsModal";
+import NotificationsModal, { NotificationItem } from "./NotificationsModal";
 import ConfirmLogoutModal from "./ConfirmLogoutModal";
 
 const routeToTitleMap: Record<string, string> = {

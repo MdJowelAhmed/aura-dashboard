@@ -44,7 +44,9 @@ export default function GameDialog({
 
   return (
     <Dialog open={actualOpen} onOpenChange={handleOpenChange}>
-      {trigger ? <DialogTrigger asChild>{trigger}</DialogTrigger> : null}
+      {trigger && typeof trigger !== "string" && typeof trigger !== "number" && typeof trigger !== "boolean" ? (
+        <DialogTrigger asChild>{trigger as React.ReactElement}</DialogTrigger>
+      ) : null}
       {/* keep same style language you've used elsewhere */}
       <DialogContent className="max-w-lg sm:max-w-xl bg-white px-6 py-5">
         <DialogHeader>
