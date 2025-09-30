@@ -89,7 +89,7 @@ export function DropdownMenuTrigger({ asChild, children }: TriggerProps) {
       className: cn((children as React.ReactElement<{ className?: string }>).props?.className),
       "aria-haspopup": "menu",
       "aria-expanded": open,
-    });
+    } as React.Attributes & React.RefAttributes<unknown>);
   }
 
 
@@ -257,8 +257,3 @@ export const DropdownMenuShortcut = (
     {...props}
   />
 );
-
-
-
-
-

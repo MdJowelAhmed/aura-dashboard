@@ -7,12 +7,17 @@ import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import Image from "next/image";
 
+type UploadedImage = {
+  file: File;
+  preview: string | ArrayBuffer | null;
+  name: string;
+};
+
 export default function VideoCallSettings() {
   const [timerValue, setTimerValue] = useState([60]);
   const [selectedColor, setSelectedColor] = useState("#4F46E5");
   const [freeAddTimeUses, setFreeAddTimeUses] = useState("");
   const [maxCallDuration, setMaxCallDuration] = useState("");
-  const [uploadedImage, setUploadedImage] = useState(null);
   const [savedColors, setSavedColors] = useState([
     "#ef4444",
     "#f97316",
@@ -31,36 +36,37 @@ export default function VideoCallSettings() {
   ]);
   const [colorFormat, setColorFormat] = useState("Hex");
   const [uploadError, setUploadError] = useState("");
-  const fileInputRef = useRef(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const [uploadedImage, setUploadedImage] = useState<UploadedImage | null>(null);
 
   // Handle image upload
- const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0];
-  setUploadError("");
+  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    setUploadError("");
 
-  if (file) {
-    if (file.size > 2 * 1024 * 1024) {
-      setUploadError("File size exceeds 2MB limit");
-      return;
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        setUploadError("File size exceeds 2MB limit");
+        return;
+      }
+
+      const validTypes = ["image/jpeg", "image/jpg", "image/png"];
+      if (!validTypes.includes(file.type)) {
+        setUploadError("Only .jpg and .png files are allowed");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImage({
+          file,
+          preview: reader.result,
+          name: file.name,
+        });
+      };
+      reader.readAsDataURL(file);
     }
-
-    const validTypes = ["image/jpeg", "image/jpg", "image/png"];
-    if (!validTypes.includes(file.type)) {
-      setUploadError("Only .jpg and .png files are allowed");
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setUploadedImage({
-        file,
-        preview: reader.result,
-        name: file.name,
-      });
-    };
-    reader.readAsDataURL(file);
-  }
-};
+  };
 
 
   // Remove uploaded image

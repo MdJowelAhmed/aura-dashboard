@@ -63,16 +63,17 @@ export function DialogTrigger({ asChild, children }: TriggerProps) {
   const { setOpen } = useDialogCtx();
 
   const onClick = (e: React.MouseEvent) => {
-    children.props?.onClick?.(e);
+    const childProps = children.props as React.Attributes & { onClick?: (e: React.MouseEvent) => void };
+    childProps?.onClick?.(e);
     setOpen(true);
   };
 
   if (asChild) {
     return React.cloneElement(children, {
-      onClick,
+      onClick: onClick,
       "aria-haspopup": "dialog",
       "aria-expanded": true,
-    });
+    } as React.Attributes & React.HTMLAttributes<HTMLElement>);
   }
 
   return (
