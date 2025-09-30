@@ -22,6 +22,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ImagePlus } from "lucide-react";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export const promoSchema = z.object({
@@ -93,7 +94,7 @@ export function PromoForm({
   );
 
   const handleImageChange = (file?: File) => {
-    form.setValue("thumbnail", file as any, { shouldValidate: true });
+    form.setValue("thumbnail", file as File | undefined, { shouldValidate: true });
     if (file) setPreview(URL.createObjectURL(file));
     else setPreview(initialImageUrl ?? null);
   };
@@ -260,10 +261,12 @@ export function PromoForm({
                     className="flex flex-col items-center justify-center gap-2 cursor-pointer"
                   >
                     {preview ? (
-                      <img
+                      <Image
                         src={preview}
                         alt="Preview"
-                        className="h-28 w-28 rounded-lg object-cover"
+                        width={112}
+                        height={112}
+                        className="rounded-lg object-cover"
                       />
                     ) : (
                       <>

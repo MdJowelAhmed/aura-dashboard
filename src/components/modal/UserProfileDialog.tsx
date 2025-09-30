@@ -152,10 +152,12 @@ export default function UserProfileDialog({
           {/* Preview box */}
           <div className="rounded-xl border border-dashed border-[#D5D8E1] p-4 text-center bg-white/60">
             {hasPassport ? (
-              <img
+              <Image
                 src={user.passportPhotoUrl as string}
                 alt="Passport preview"
-                className="mx-auto h-36 w-48 rounded-md object-cover"
+                className="mx-auto rounded-md object-cover"
+                width={192} /* w-48 = 12rem = 192px */
+                height={144} /* h-36 = 9rem = 144px */
                 onError={() => setPassportErrored(true)}
               />
             ) : (

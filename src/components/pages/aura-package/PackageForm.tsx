@@ -56,7 +56,7 @@ export default function PackageForm({
     resolver: zodResolver(packageSchema),
     defaultValues: {
       packageName: initialValues?.packageName ?? "",
-      duration: (initialValues?.duration as any) ?? undefined,
+      duration: initialValues?.duration as z.infer<typeof packageSchema>["duration"] ?? undefined,
       price: initialValues?.price ?? "",
     },
   });

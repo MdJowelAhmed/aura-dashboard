@@ -94,7 +94,7 @@ export function GameManagement() {
     });
   };
 
-  const handlePagination = (page: number) => setCurrentPage(page);
+  // const handlePagination = (page: number) => setCurrentPage(page);
 
   // Apply status filter BEFORE pagination
   const filteredGames =
@@ -174,7 +174,8 @@ export function GameManagement() {
   const handleDelete = (id: number) => {
     setGames((rows) => rows.filter((r) => r.id !== id));
     setToggleStates((prev) => {
-      const { [id]: _, ...rest } = prev;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [id]: removed, ...rest } = prev;
       return rest;
     });
     if (editing?.id === id) {
@@ -235,7 +236,7 @@ export function GameManagement() {
           toggleStates={toggleStates}
           handleToggle={handleToggle}
           headerNames={headerNames}
-          onEdit={handleEditClick}
+          onEdit={(row) => handleEditClick(row as GameRow)}
           onDelete={handleDelete}
         />
 

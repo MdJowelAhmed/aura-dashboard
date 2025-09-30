@@ -20,10 +20,11 @@ function displayToISO(s: string): string {
   try {
     const [datePart, timePart, ampm] = s.split(" ");
     const [dd, mm, yyyy] = datePart.split("-").map(Number);
-    let [hh, min] = timePart.split(":").map(Number);
+    let [hh] = timePart.split(":").map(Number);
+    const minutes = timePart.split(":").map(Number)[1] || 0;
     if ((ampm || "").toUpperCase() === "PM" && hh < 12) hh += 12;
     if ((ampm || "").toUpperCase() === "AM" && hh === 12) hh = 0;
-    const d = new Date(yyyy, (mm || 1) - 1, dd || 1, hh || 0, min || 0, 0);
+    const d = new Date(yyyy, (mm || 1) - 1, dd || 1, hh || 0, minutes, 0);
     return d.toISOString();
   } catch {
     return new Date().toISOString();
@@ -134,7 +135,7 @@ export function EventManagement() {
     });
   };
 
-  const handlePagination = (page: number) => setCurrentPage(page);
+  // Pagination is handled directly in the UI components
 
   // Pagination
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -221,7 +222,8 @@ export function EventManagement() {
   const handleDelete = (id: number) => {
     setBundles((rows) => rows.filter((r) => r.id !== id));
     setToggleStates((prev) => {
-      const { [id]: _, ...rest } = prev;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [id]: removed, ...rest } = prev;
       return rest;
     });
     if (editing?.id === id) {

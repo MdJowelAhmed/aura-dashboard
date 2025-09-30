@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { ImagePlus } from "lucide-react";
+import Image from "next/image";
 
 export const gameSchema = z.object({
   gameTitle: z.string().min(1, "Game title is required"),
@@ -60,7 +61,7 @@ export function GameForm({
   );
 
   const handleImageChange = (file?: File) => {
-    form.setValue("thumbnail", file as any, { shouldValidate: true });
+    form.setValue("thumbnail", file as File | undefined, { shouldValidate: true });
     if (file) {
       const url = URL.createObjectURL(file);
       setPreview(url);
@@ -129,9 +130,11 @@ export function GameForm({
                     className="flex flex-col items-center justify-center gap-2 cursor-pointer"
                   >
                     {preview ? (
-                      <img
+                      <Image
                         src={preview}
                         alt="Preview"
+                        width={112}
+                        height={112}
                         className="h-28 w-28 rounded-lg object-cover"
                       />
                     ) : (

@@ -1,7 +1,6 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { Edit3, Trash2 } from "lucide-react";
-import Image from "next/image";
 import { EventRow } from "./EventManagement";
 
 interface TableProps {
@@ -50,7 +49,7 @@ export function Table({
       {/* Table Body */}
       <div className="bg-white/20 backdrop-blur-md rounded-xl border border-white/20 overflow-x-auto max-w-full">
         <div className="p-4 space-y-4">
-          {bundles.map((bundle, idx) => (
+          {bundles.map((bundle) => (
             <div
               key={bundle.id}
               className="bg-white/90 backdrop-blur-sm rounded-lg border border-white/20 p-2 hover:bg-white/95 transition-all duration-200"

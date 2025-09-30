@@ -53,12 +53,18 @@ const conversationsData = [
   { month: "Dec", messages: 60, videoCalls: 85 },
 ];
 
+  const features = [
+    { name: 'Select City', percentage: 68, color: 'bg-blue-500' },
+    { name: 'Revive Chat', percentage: 22, color: 'bg-green-500' },
+    { name: 'Boosts', percentage: 15, color: 'bg-orange-500' }
+  ];
+
 export default function EngagementAppUsage() {
   return (
     <div className="min-h-screen   text-white flex">
       {/* Main Content */}
       <div className="flex-1 ">
-        <div className=" rounded-lg px-6 mb-6">
+        <div className=" rounded-lg  mb-6">
           <ChartHeader />
 
           <div className="grid grid-cols-2 gap-6 mb-6">
@@ -202,58 +208,35 @@ export default function EngagementAppUsage() {
           </div>
         </div>
 
-        <div className="px-6">
-          <Card className="bg-white/20 p-6">
-            <CardContent className="p-0">
-              <div className="mb-4">
-                <h4 className="text-lg font-semibold text-white">
-                  Feature Adoption Rate
-                </h4>
-                <p className="text-sm text-gray-300">
-                  Percentage of active users utilizing key features.
-                </p>
-              </div>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-white">Select City</span>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-64 bg-gray-400 rounded-full h-2">
-                      <div
-                        className="bg-blue-500 h-2 rounded-full"
-                        style={{ width: "68%" }}
-                      ></div>
-                    </div>
-                    <span className="text-white font-semibold">68%</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-white">Revive Chat</span>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-64 bg-gray-400 rounded-full h-2">
-                      <div
-                        className="bg-teal-500 h-2 rounded-full"
-                        style={{ width: "22%" }}
-                      ></div>
-                    </div>
-                    <span className="text-white font-semibold">22%</span>
-                  </div>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-white">Boosts</span>
-                  <div className="flex items-center space-x-3">
-                    <div className="w-64 bg-gray-400 rounded-full h-2">
-                      <div
-                        className="bg-orange-500 h-2 rounded-full"
-                        style={{ width: "15%" }}
-                      ></div>
-                    </div>
-                    <span className="text-white font-semibold">15%</span>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+      <div className=" bg-white/25 flex items-center justify-center rounded-md">
+      <div className="w-full  bg-white/25 rounded-lg shadow-lg p-6">
+        <div className="mb-6">
+          <h3 className="text-xl font-semibold text-white mb-2">
+            Feature Adoption Rate
+          </h3>
+          <p className="text-sm text-gray-300">
+            Percentage of active users utilizing key features.
+          </p>
         </div>
+        
+        <div className="space-y-6">
+          {features.map((feature, index) => (
+            <div key={index} className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-white font-medium">{feature.name}</span>
+                <span className="text-white font-semibold">{feature.percentage}%</span>
+              </div>
+              <div className="w-full bg-gray-400 rounded-full h-3 overflow-hidden">
+                <div
+                  className={`${feature.color} h-3 rounded-full transition-all duration-500 ease-out`}
+                  style={{ width: `${feature.percentage}%` }}
+                ></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
       </div>
     </div>
   );

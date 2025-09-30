@@ -21,8 +21,11 @@ const StatisticsCard = ({
 );
 
 const StatisticsDashboard = () => {
+  // These variables will be used in future implementations
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [selectedPeriod, setSelectedPeriod] = useState("Last 7 Days");
 
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const periods = ["Last 7 Days", "Last 30 Days", "Last 3 Months", "Last Year"];
 
   const statsData = {
@@ -43,13 +46,7 @@ const StatisticsDashboard = () => {
       earnFromAura: "4,300",
       earnFromShop: "22,000",
       totalRevenue: "$380,000",
-    },
-    "Last Year": {
-      totalUser: "18,500",
-      earnFromAura: "15,200",
-      earnFromShop: "75,000",
-      totalRevenue: "$1,250,000",
-    },
+    }
   };
 
   const currentStats = statsData[selectedPeriod as keyof typeof statsData];
@@ -64,7 +61,8 @@ const StatisticsDashboard = () => {
             <h1 className="text-4xl font-bold text-white">Statistics</h1>
 
             {/* Period Selector */}
-            <div className="relative">
+            <p className="text-white/60 text-sm font-medium">Last 7 Days</p>
+            {/* <div className="relative">
               <select
                 value={selectedPeriod}
                 onChange={(e) => setSelectedPeriod(e.target.value)}
@@ -95,7 +93,7 @@ const StatisticsDashboard = () => {
                   />
                 </svg>
               </div>
-            </div>
+            </div> */}
           </div>
 
           {/* Stats Grid */}

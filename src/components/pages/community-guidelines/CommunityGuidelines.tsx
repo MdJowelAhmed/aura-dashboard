@@ -14,7 +14,6 @@ import {
   Quote,
   Link,
   Image,
-  Code,
   AlignLeft,
   AlignCenter,
   AlignRight,
@@ -92,7 +91,7 @@ const CommunityGuidelinesEditor: React.FC<
       handleContentChange();
       editorRef?.focus();
     },
-    [executeCommand, editorRef, handleContentChange]
+    [editorRef, handleContentChange]
   );
 
   const insertHeading = useCallback(

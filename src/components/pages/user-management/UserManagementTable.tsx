@@ -116,7 +116,8 @@ export function UserManagement() {
   const handleDelete = (id: number) => {
     setRows((rs) => rs.filter((r) => r.id !== id));
     setToggleStates((prev) => {
-      const { [id]: _, ...rest } = prev;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [id]: removed, ...rest } = prev;
       return rest;
     });
   };
@@ -271,7 +272,7 @@ export function UserManagement() {
       <UserProfileDialog
         open={profileOpen}
         onOpenChange={setProfileOpen}
-        user={profileUser as any}
+        user={profileUser}
       />
     </div>
   );

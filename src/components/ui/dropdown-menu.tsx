@@ -68,13 +68,13 @@ export function DropdownMenuTrigger({ asChild, children }: TriggerProps) {
       if (content && content.contains(target)) return;
       setOpen(false);
     };
-    document.addEventListener("click", onDocClick as any);
-    return () => document.removeEventListener("click", onDocClick as any);
+    document.addEventListener("click", onDocClick as EventListener);
+    return () => document.removeEventListener("click", onDocClick as EventListener);
   }, [setOpen, triggerRef]);
 
   if (asChild) {
     return React.cloneElement(children, {
-      ref: triggerRef as any,
+      ref: triggerRef as React.RefObject<HTMLElement>,
       onClick,
       className: cn(children.props.className),
       "aria-haspopup": "menu",
@@ -84,7 +84,7 @@ export function DropdownMenuTrigger({ asChild, children }: TriggerProps) {
 
   return (
     <button
-      ref={triggerRef as any}
+      ref={triggerRef as React.RefObject<HTMLButtonElement>}
       onClick={onClick}
       aria-haspopup="menu"
       aria-expanded={open}
@@ -216,10 +216,10 @@ export const DropdownMenuRadioGroup = ({
 }: {
   children: React.ReactNode;
 }) => <>{children}</>;
-export const DropdownMenuCheckboxItem = (props: any) => (
+export const DropdownMenuCheckboxItem = (props: React.ComponentPropsWithoutRef<typeof DropdownMenuItem>) => (
   <DropdownMenuItem {...props} />
 );
-export const DropdownMenuRadioItem = (props: any) => (
+export const DropdownMenuRadioItem = (props: React.ComponentPropsWithoutRef<typeof DropdownMenuItem>) => (
   <DropdownMenuItem {...props} />
 );
 export const DropdownMenuShortcut = (

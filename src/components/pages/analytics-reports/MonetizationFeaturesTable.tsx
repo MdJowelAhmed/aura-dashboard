@@ -1,34 +1,39 @@
-import { Card, CardContent } from "@/components/ui/card";
+const CityUsersTable = () => {
+  const tableData = [
+    { rank: 1, city: "New York", state: "New York", users: "(8M)", signups: 300 },
+    { rank: 2, city: "Los Angeles", state: "California", users: "(8M)", signups: 300 },
+    { rank: 3, city: "Chicago", state: "Illinois", users: "(8M)", signups: 300 },
+    { rank: 4, city: "New York", state: "New York", users: "(8M)", signups: 300 },
+  ];
 
-const MonetizationFeaturesTable = () => {
   return (
-    <Card className=" bg-transparent p-4 border-none shadow-none px-6">
-      <CardContent className="p-0">
-        <h4 className="text-lg font-semibold text-white mb-4">
-          Top Monetization Features
-        </h4>
-        <Card className="grid grid-cols-3 gap-4 p-4 px-10 bg-white/20 text-white font-semibold">
-          <div>Rank</div>
-          <div>Feature Name</div>
-          <div className="text-right">Revenue</div>
-        </Card>
-        <Card className="rounded-lg bg-white/20 overflow-hidden mt-2">
-          <div className="space-y-2 p-4 ">
-            <div className="grid grid-cols-3 gap-4 p-3 px-10 bg-white rounded text-gray-800">
-              <div>1</div>
-              <div>Monthly Aura+ Subscription</div>
-              <div className="text-right">$8000</div>
-            </div>
-            <div className="grid grid-cols-3 gap-4 p-3 px-10 bg-white rounded text-gray-800">
-              <div>2</div>
-              <div>100 Coin Pack</div>
-              <div className="text-right">$3000</div>
-            </div>
-          </div>
-        </Card>
-      </CardContent>
-    </Card>
+    <div className="bg-transparent my-10">
+      <div className="overflow-hidden rounded-lg">
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-white/25 text-white">
+              <th className="p-4 text-left font-semibold">Rank</th>
+              <th className="p-4 text-left font-semibold">City</th>
+              <th className="p-4 text-left font-semibold">State</th>
+              <th className="p-4 text-left font-semibold">Users</th>
+              <th className="p-4 text-right font-semibold">Sign-ups</th>
+            </tr>
+          </thead>
+          <tbody className="bg-gray-700">
+            {tableData.map((row) => (
+              <tr key={row.rank} className="bg-white">
+                <td className="p-3 text-gray-800 border-b-2 border-gray-700">{row.rank}</td>
+                <td className="p-3 text-gray-800 border-b-2 border-gray-700">{row.city}</td>
+                <td className="p-3 text-gray-800 border-b-2 border-gray-700">{row.state}</td>
+                <td className="p-3 text-gray-800 border-b-2 border-gray-700">{row.users}</td>
+                <td className="p-3 text-gray-800 text-right border-b-2 border-gray-700">{row.signups}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    </div>
   );
 };
 
-export default MonetizationFeaturesTable;
+export default CityUsersTable;

@@ -13,6 +13,7 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { ImagePlus } from "lucide-react";
+import Image from "next/image";
 
 export const createEventSchema = z.object({
   eventName: z.string().min(1, "Event name is required"),
@@ -79,7 +80,7 @@ export function CreateEventForm({
   );
 
   const handleImageChange = (file?: File) => {
-    form.setValue("thumbnail", file as any, { shouldValidate: true });
+    form.setValue("thumbnail", file as z.infer<typeof createEventSchema>["thumbnail"], { shouldValidate: true });
     if (file) {
       const url = URL.createObjectURL(file);
       setPreview(url);
@@ -216,11 +217,14 @@ export function CreateEventForm({
                     className="flex flex-col items-center justify-center gap-2 cursor-pointer"
                   >
                     {preview ? (
-                      <img
-                        src={preview}
-                        alt="Preview"
-                        className="h-28 w-28 rounded-lg object-cover"
-                      />
+                      <div className="relative h-28 w-28 rounded-lg overflow-hidden">
+                        <Image
+                          src={preview}
+                          alt="Preview"
+                          fill
+                          className="object-cover"
+                        />
+                      </div>
                     ) : (
                       <>
                         <ImagePlus className="h-8 w-8 opacity-70" />

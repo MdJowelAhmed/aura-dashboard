@@ -154,7 +154,8 @@ export function AuraPackage() {
   const handleDelete = (id: number) => {
     setRows((rs) => rs.filter((r) => r.id !== id));
     setToggleStates((prev) => {
-      const { [id]: _, ...rest } = prev;
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [id]: removed, ...rest } = prev;
       return rest;
     });
     if (editing?.id === id) {

@@ -1,5 +1,6 @@
 "use client";
 
+
 import * as React from "react";
 import {
   Controller,
@@ -10,6 +11,7 @@ import {
   useFormContext,
 } from "react-hook-form";
 import { cn } from "@/lib/utils";
+
 
 /**
  * Minimal shadcn-compatible form primitives
@@ -23,16 +25,20 @@ import { cn } from "@/lib/utils";
  * )} /></form></Form>
  */
 
+
 export const Form = FormProvider;
+
 
 type FormFieldContextValue<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
 > = { name: TName };
 
+
 const FormFieldContext = React.createContext<FormFieldContextValue | null>(
   null
 );
+
 
 export function useFormField() {
   const ctx = React.useContext(FormFieldContext);
@@ -52,6 +58,7 @@ export function useFormField() {
   };
 }
 
+
 export function FormField<
   TFieldValues extends FieldValues = FieldValues,
   TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>
@@ -59,11 +66,11 @@ export function FormField<
   const { name, ...rest } = props;
   return (
     <FormFieldContext.Provider value={{ name }}>
-      {/* @ts-expect-error generic passthrough */}
       <Controller name={name} {...rest} />
     </FormFieldContext.Provider>
   );
 }
+
 
 export function FormItem({
   className,
@@ -71,6 +78,7 @@ export function FormItem({
 }: React.HTMLAttributes<HTMLDivElement>) {
   return <div className={cn("space-y-2", className)} {...props} />;
 }
+
 
 export function FormLabel({
   className,
@@ -87,6 +95,7 @@ export function FormLabel({
   );
 }
 
+
 export function FormControl({
   className,
   ...props
@@ -94,6 +103,7 @@ export function FormControl({
   // Simple wrapper; shadcn uses Slot, but a div works for most cases
   return <div className={cn(className)} {...props} />;
 }
+
 
 export function FormMessage({
   className,
@@ -114,6 +124,7 @@ export function FormMessage({
   );
 }
 
+
 export function FormDescription({
   className,
   ...props
@@ -127,6 +138,7 @@ export function FormDescription({
     />
   );
 }
+
 
 /* ---------- helpers ---------- */
 function safeUseFormIds() {
@@ -147,6 +159,12 @@ function safeUseFormIds() {
         isDirty: false,
         error: undefined,
       },
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } as any;
   }
 }
+
+
+
+
+
